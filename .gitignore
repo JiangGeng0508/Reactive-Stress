@@ -1,0 +1,15 @@
+.gradle/
+build/
+run/
+run-data/
+runs/
+out/
+repo/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.log
+hs_err_pid*
+replay_pid*
+/src/generated/resources/.cache/

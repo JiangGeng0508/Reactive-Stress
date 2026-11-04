@@ -1,13 +1,13 @@
 modLoader="javafml"
-loaderVersion="[4,)"
-license="MIT"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
 
 [[mods]]
-modId="create_reactive_stress"
-version="1.0.3"
-displayName="Create: Reactive Stress"
-description='Addon mod to adjust Create mod stress calculations based on machine activity.'
-authors="Peterhun"
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+description='''${mod_description}'''
+authors="${mod_authors}"
 
 [[mixins]]
 config = "create_reactive_stress.mixins.json"
@@ -16,20 +16,20 @@ config = "create_reactive_stress.mixins.json"
 [[dependencies.create_reactive_stress]]
 modId = "neoforge"
 type = "required"
-versionRange = "[21,)"
+versionRange = "${neo_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.create_reactive_stress]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.21,)"
+versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.create_reactive_stress]]
 modId = "create"
 type = "required"
-versionRange = "[6.0.0,)"
+versionRange = "${create_version_range}"
 ordering = "NONE"
 side = "BOTH"

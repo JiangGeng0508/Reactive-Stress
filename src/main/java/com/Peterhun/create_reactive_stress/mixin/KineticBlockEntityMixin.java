@@ -55,7 +55,9 @@ public abstract class KineticBlockEntityMixin{
         KineticBlockEntity self = (KineticBlockEntity)(Object)this;
         float baseImpact = (float) BlockStressValues.getImpact(self.getBlockState().getBlock());
 
-        return (float) (baseImpact * createReactiveStress$GetConfig(self));
+        float impact = (float) (baseImpact * createReactiveStress$GetConfig(self));
+        this.lastStressApplied = impact;
+        return impact;
     }
 
 
@@ -106,7 +108,6 @@ public abstract class KineticBlockEntityMixin{
         // Only run on server side
         assert self.getLevel() != null;
         if (self.getLevel().isClientSide()) return;
-        if (overStressed) return;
 
         createReactiveStress$reactiveStressTickCounter++;
 
@@ -114,21 +115,20 @@ public abstract class KineticBlockEntityMixin{
         createReactiveStress$reactiveStressTickCounter = 0;
 
 
-        if (getOrCreateNetwork() != null) {
+        KineticNetwork network = getOrCreateNetwork();
+        if (network != null) {
+            Float previousImpact = network.members.get(self);
+            if (previousImpact == null) return;
             float impact = calculateStressApplied();
 
-            if (Math.abs(impact - lastStressApplied) > 1e-4f) {
-                lastStressApplied = impact;
-                getOrCreateNetwork().updateStressFor(self, impact);
+            if (Math.abs(impact - previousImpact) > 1e-4f) {
+                network.updateStressFor(self, impact);
                 self.setChanged();
             }
         }
     }
 
 
-
-    @Shadow
-    protected boolean overStressed;
 
     @Shadow
     public abstract float getTheoreticalSpeed();
