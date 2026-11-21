@@ -19,6 +19,7 @@ import net.createmod.catnip.data.Iterate;
 import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -41,6 +42,7 @@ import static net.minecraft.ChatFormatting.GRAY;
 public abstract class KineticBlockEntityMixin{
 
     @Shadow protected float lastStressApplied;
+    @Shadow protected boolean overStressed;
 
     @Shadow
     public abstract KineticNetwork getOrCreateNetwork();
@@ -56,6 +58,13 @@ public abstract class KineticBlockEntityMixin{
         float baseImpact = (float) BlockStressValues.getImpact(self.getBlockState().getBlock());
 
         float impact = (float) (baseImpact * createReactiveStress$GetConfig(self));
+        // An overloaded mixer can abort a recipe and clear running before the next stress check.
+        // Keep charging for the pending recipe so the network cannot restart on its idle load.
+        if (self instanceof MechanicalMixerBlockEntity mixer && !mixer.running && overStressed
+                && lastStressApplied > baseImpact && mixer.getLevel() instanceof ServerLevel
+                && !((MechanicalMixerAccessor) mixer).createReactiveStress$getMatchingRecipes().isEmpty()) {
+            impact = (float) (baseImpact * UtilityHelperClass.createReactiveStress$valueMixer);
+        }
         this.lastStressApplied = impact;
         return impact;
     }
