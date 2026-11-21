@@ -1,9 +1,9 @@
 package com.Peterhun.create_reactive_stress.mixin;
 
+import com.Peterhun.create_reactive_stress.ReactiveStressNetwork;
 import com.Peterhun.create_reactive_stress.UtilityHelperClass;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.simibubi.create.api.stress.BlockStressValues;
-import com.simibubi.create.content.kinetics.KineticNetwork;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 
 
@@ -43,9 +43,6 @@ public abstract class KineticBlockEntityMixin{
 
     @Shadow protected float lastStressApplied;
     @Shadow protected boolean overStressed;
-
-    @Shadow
-    public abstract KineticNetwork getOrCreateNetwork();
 
     /**
      * @author Peterhun
@@ -124,17 +121,7 @@ public abstract class KineticBlockEntityMixin{
         createReactiveStress$reactiveStressTickCounter = 0;
 
 
-        KineticNetwork network = getOrCreateNetwork();
-        if (network != null) {
-            Float previousImpact = network.members.get(self);
-            if (previousImpact == null) return;
-            float impact = calculateStressApplied();
-
-            if (Math.abs(impact - previousImpact) > 1e-4f) {
-                network.updateStressFor(self, impact);
-                self.setChanged();
-            }
-        }
+        ReactiveStressNetwork.refresh(self);
     }
 
 
